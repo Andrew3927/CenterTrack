@@ -18,16 +18,16 @@ from .datasets.kitti_tracking import KITTITracking
 from .datasets.custom_dataset import CustomDataset
 
 dataset_factory = {
-  'custom': CustomDataset,
-  'coco': COCO,
-  'kitti': KITTI,
-  'coco_hp': COCOHP,
-  'mot': MOT,
-  'nuscenes': nuScenes,
-  'crowdhuman': CrowdHuman,
-  'kitti_tracking': KITTITracking,
+    'custom': CustomDataset,
+    'coco': COCO,
+    'kitti': KITTI,
+    'coco_hp': COCOHP,
+    'mot': MOT,
+    'nuscenes': nuScenes,
+    'crowdhuman': CrowdHuman,
+    'kitti_tracking': KITTITracking,
 }
 
 
 def get_dataset(dataset):
-  return dataset_factory[dataset]
+    return dataset_factory[dataset]

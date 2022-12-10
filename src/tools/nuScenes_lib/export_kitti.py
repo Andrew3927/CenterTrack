@@ -287,7 +287,7 @@ class KittiConverter:
         results = {}
 
         # Load the KITTI dataset.
-        kitti = KittiDB(root=self.nusc_kitti_dir, splits=(self.split, ))
+        kitti = KittiDB(root=self.nusc_kitti_dir, splits=(self.split,))
 
         # Get assignment of scenes to splits.
         split_logs = create_splits_logs(self.split, self.nusc)
@@ -353,7 +353,6 @@ class KittiConverter:
             if logfile in split_logs:
                 samples.append(sample['token'])
         return samples
-
 
 # if __name__ == '__main__':
 #     fire.Fire(KittiConverter)

@@ -17,13 +17,13 @@ import torch
 import torch.nn as nn
 
 try:
-  from ..DCNv2.dcn_v2 import DCN
+    from ..DCNv2.dcn_v2 import DCN
 except:
-  print('import DCN failed')
-  DCN = None
-
+    print('import DCN failed')
+    DCN = None
 
 BN_MOMENTUM = 0.1
+
 
 def fill_up_weights(up):
     w = up.weight.data
@@ -34,7 +34,8 @@ def fill_up_weights(up):
             w[0, 0, i, j] = \
                 (1 - math.fabs(i / f - c)) * (1 - math.fabs(j / f - c))
     for c in range(1, w.size(0)):
-        w[c, 0, :, :] = w[0, 0, :, :] 
+        w[c, 0, :, :] = w[0, 0, :, :]
+
 
 def fill_fc_weights(layers):
     for m in layers.modules():
@@ -44,6 +45,7 @@ def fill_fc_weights(layers):
             # torch.nn.init.xavier_normal_(m.weight.data)
             if m.bias is not None:
                 nn.init.constant_(m.bias, 0)
+
 
 class MSRAUp(nn.Module):
     # def __init__(self, block, layers, heads, head_conv):
@@ -71,7 +73,6 @@ class MSRAUp(nn.Module):
                 [4, 4, 4],
             )
         self.init_weights()
-        
 
     def forward(self, x):
         x = self.deconv_layers(x[-1])
@@ -102,21 +103,21 @@ class MSRAUp(nn.Module):
                 self._get_deconv_cfg(num_kernels[i], i)
 
             planes = num_filters[i]
-            fc = DCN(self.inplanes, planes, 
-                    kernel_size=(3,3), stride=1,
-                    padding=1, dilation=1, deformable_groups=1)
+            fc = DCN(self.inplanes, planes,
+                     kernel_size=(3, 3), stride=1,
+                     padding=1, dilation=1, deformable_groups=1)
             # fc = nn.Conv2d(self.inplanes, planes,
             #         kernel_size=3, stride=1, 
             #         padding=1, dilation=1, bias=False)
             # fill_fc_weights(fc)
             up = nn.ConvTranspose2d(
-                    in_channels=planes,
-                    out_channels=planes,
-                    kernel_size=kernel,
-                    stride=2,
-                    padding=padding,
-                    output_padding=output_padding,
-                    bias=self.deconv_with_bias)
+                in_channels=planes,
+                out_channels=planes,
+                kernel_size=kernel,
+                stride=2,
+                padding=padding,
+                output_padding=output_padding,
+                bias=self.deconv_with_bias)
             fill_up_weights(up)
 
             layers.append(fc)

@@ -17,13 +17,12 @@ import torch
 import torch.nn as nn
 
 try:
-  from .DCNv2.dcn_v2 import DCN
+    from .DCNv2.dcn_v2 import DCN
 except:
-  print('Import DCN failed')
-  DCN = None
+    print('Import DCN failed')
+    DCN = None
 import torch.utils.model_zoo as model_zoo
 from .base_model import BaseModel
-
 
 BN_MOMENTUM = 0.1
 logger = logging.getLogger(__name__)
@@ -35,6 +34,7 @@ model_urls = {
     'resnet101': 'https://download.pytorch.org/models/resnet101-5d3b4d8f.pth',
     'resnet152': 'https://download.pytorch.org/models/resnet152-b121ed2d.pth',
 }
+
 
 def conv3x3(in_planes, out_planes, stride=1):
     """3x3 convolution with padding"""
@@ -114,6 +114,7 @@ class Bottleneck(nn.Module):
 
         return out
 
+
 def fill_up_weights(up):
     w = up.weight.data
     f = math.ceil(w.size(2) / 2)
@@ -123,7 +124,8 @@ def fill_up_weights(up):
             w[0, 0, i, j] = \
                 (1 - math.fabs(i / f - c)) * (1 - math.fabs(j / f - c))
     for c in range(1, w.size(0)):
-        w[c, 0, :, :] = w[0, 0, :, :] 
+        w[c, 0, :, :] = w[0, 0, :, :]
+
 
 def fill_fc_weights(layers):
     for m in layers.modules():
@@ -135,12 +137,12 @@ def fill_fc_weights(layers):
                 nn.init.constant_(m.bias, 0)
 
 
-
 resnet_spec = {18: (BasicBlock, [2, 2, 2, 2]),
                34: (BasicBlock, [3, 4, 6, 3]),
                50: (Bottleneck, [3, 4, 6, 3]),
                101: (Bottleneck, [3, 4, 23, 3]),
                152: (Bottleneck, [3, 8, 36, 3])}
+
 
 class PoseResDCN(BaseModel):
     # def __init__(self, block, layers, heads, head_conv):
@@ -180,7 +182,6 @@ class PoseResDCN(BaseModel):
             )
 
         self.init_weights(num_layers, _.rgb)
-        
 
     def img2feats(self, x):
         x = self.conv1(x)
@@ -195,7 +196,6 @@ class PoseResDCN(BaseModel):
 
         x = self.deconv_layers(x)
         return [x]
-
 
     def _make_layer(self, block, planes, blocks, stride=1):
         downsample = None
@@ -239,21 +239,21 @@ class PoseResDCN(BaseModel):
                 self._get_deconv_cfg(num_kernels[i], i)
 
             planes = num_filters[i]
-            fc = DCN(self.inplanes, planes, 
-                    kernel_size=(3,3), stride=1,
-                    padding=1, dilation=1, deformable_groups=1)
+            fc = DCN(self.inplanes, planes,
+                     kernel_size=(3, 3), stride=1,
+                     padding=1, dilation=1, deformable_groups=1)
             # fc = nn.Conv2d(self.inplanes, planes,
             #         kernel_size=3, stride=1, 
             #         padding=1, dilation=1, bias=False)
             # fill_fc_weights(fc)
             up = nn.ConvTranspose2d(
-                    in_channels=planes,
-                    out_channels=planes,
-                    kernel_size=kernel,
-                    stride=2,
-                    padding=padding,
-                    output_padding=output_padding,
-                    bias=self.deconv_with_bias)
+                in_channels=planes,
+                out_channels=planes,
+                kernel_size=kernel,
+                stride=2,
+                padding=padding,
+                output_padding=output_padding,
+                bias=self.deconv_with_bias)
             fill_up_weights(up)
 
             layers.append(fc)
@@ -274,9 +274,9 @@ class PoseResDCN(BaseModel):
         if rgb:
             print('shuffle ImageNet pretrained model from RGB to BGR')
             self.base.base_layer[0].weight.data[:, 0], \
-            self.base.base_layer[0].weight.data[:, 2] =  \
+                self.base.base_layer[0].weight.data[:, 2] = \
                 self.base.base_layer[0].weight.data[:, 2].clone(), \
-                self.base.base_layer[0].weight.data[:, 0].clone()
+                    self.base.base_layer[0].weight.data[:, 0].clone()
         print('=> init deconv weights from normal distribution')
         for name, m in self.deconv_layers.named_modules():
             if isinstance(m, nn.BatchNorm2d):

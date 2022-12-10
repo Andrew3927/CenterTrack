@@ -13,9 +13,9 @@ from torch import nn
 import torch.nn.functional as F
 import torch.utils.model_zoo as model_zoo
 
-
 BN_MOMENTUM = 0.1
 logger = logging.getLogger(__name__)
+
 
 def get_model_url(data='imagenet', name='dla34', hash='ba72cf86'):
     return join('http://dl.yf.io/dla/models', data, '{}-{}.pth'.format(name, hash))
@@ -221,8 +221,8 @@ class Tree(nn.Module):
 
 
 class DLA(nn.Module):
-    def __init__(self, levels, channels, 
-                 block=BasicBlock, residual_root=False, 
+    def __init__(self, levels, channels,
+                 block=BasicBlock, residual_root=False,
                  opt=None):
         super(DLA, self).__init__()
         self.channels = channels
@@ -254,17 +254,17 @@ class DLA(nn.Module):
         if opt.pre_img:
             print('adding pre_img layer...')
             self.pre_img_layer = nn.Sequential(
-            nn.Conv2d(3, channels[0], kernel_size=7, stride=1,
-                      padding=3, bias=False),
-            nn.BatchNorm2d(channels[0], momentum=BN_MOMENTUM),
-            nn.ReLU(inplace=True))
+                nn.Conv2d(3, channels[0], kernel_size=7, stride=1,
+                          padding=3, bias=False),
+                nn.BatchNorm2d(channels[0], momentum=BN_MOMENTUM),
+                nn.ReLU(inplace=True))
         if opt.pre_hm:
             print('adding pre_hm layer...')
             self.pre_hm_layer = nn.Sequential(
-            nn.Conv2d(1, channels[0], kernel_size=7, stride=1,
-                    padding=3, bias=False),
-            nn.BatchNorm2d(channels[0], momentum=BN_MOMENTUM),
-            nn.ReLU(inplace=True))
+                nn.Conv2d(1, channels[0], kernel_size=7, stride=1,
+                          padding=3, bias=False),
+                nn.BatchNorm2d(channels[0], momentum=BN_MOMENTUM),
+                nn.ReLU(inplace=True))
 
     def _make_level(self, block, inplanes, planes, blocks, stride=1):
         downsample = None
@@ -305,7 +305,7 @@ class DLA(nn.Module):
         for i in range(6):
             x = getattr(self, 'level{}'.format(i))(x)
             y.append(x)
-        
+
         return y
 
     def load_pretrained_model(self, data='imagenet', name='dla34', hash='ba72cf86'):
@@ -320,9 +320,10 @@ class DLA(nn.Module):
             kernel_size=1, stride=1, padding=0, bias=True)
         self.load_state_dict(model_weights, strict=False)
 
+
 model_dict = {
     'dla34': (
-        [1, 1, 1, 2, 2, 1], 
+        [1, 1, 1, 2, 2, 1],
         [16, 32, 64, 128, 256, 512],
         'ba72cf86'),
     'dla102': (
@@ -350,15 +351,15 @@ model_dict = {
         [16, 32, 128, 256, 512, 1024],
         'd15cacda'),
     'dla102x': (
-        [1, 1, 1, 3, 4, 1], 
+        [1, 1, 1, 3, 4, 1],
         [16, 32, 128, 256, 512, 1024],
         'ad62be81'),
     'dla102x2': (
-        [1, 1, 1, 3, 4, 1], 
+        [1, 1, 1, 3, 4, 1],
         [16, 32, 128, 256, 512, 1024],
         '262837b6'),
     'dla169': (
-        [1, 1, 2, 3, 5, 1], 
+        [1, 1, 2, 3, 5, 1],
         [16, 32, 128, 256, 512, 1024],
         '0914e092'
     )
@@ -376,6 +377,7 @@ def dla34(pretrained=True, **kwargs):  # DLA-34
         print('Warning: No ImageNet pretrain!!')
     return model
 
+
 def dla102(pretrained=None, **kwargs):  # DLA-102
     Bottleneck.expansion = 2
     model = DLA([1, 1, 1, 3, 4, 1], [16, 32, 128, 256, 512, 1024],
@@ -384,6 +386,7 @@ def dla102(pretrained=None, **kwargs):  # DLA-102
         model.load_pretrained_model(
             data='imagenet', name='dla102', hash='d94d9790')
     return model
+
 
 def dla46_c(pretrained=None, **kwargs):  # DLA-46-C
     Bottleneck.expansion = 2

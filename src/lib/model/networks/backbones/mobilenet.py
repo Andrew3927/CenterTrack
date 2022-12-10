@@ -16,8 +16,9 @@ from torchvision.models.utils import load_state_dict_from_url
 BN_MOMENTUM = 0.1
 
 model_urls = {
-     'mobilenet_v2': 'https://download.pytorch.org/models/mobilenet_v2-b0353104.pth',
+    'mobilenet_v2': 'https://download.pytorch.org/models/mobilenet_v2-b0353104.pth',
 }
+
 
 def _make_divisible(v, divisor, min_value=None):
     """
@@ -100,15 +101,15 @@ class MobileNetV2(nn.Module):
 
         inverted_residual_setting = [
             # t, c, n, s
-            [1, 16, 1, 1], # 1
-            [6, 24, 2, 2], # 2
-            [6, 32, 3, 2], # 3
-            [6, 64, 4, 2], # 4
-            [6, 96, 3, 1], # 5
-            [6, 160, 3, 2],# 6
-            [6, 320, 1, 1],# 7
+            [1, 16, 1, 1],  # 1
+            [6, 24, 2, 2],  # 2
+            [6, 32, 3, 2],  # 3
+            [6, 64, 4, 2],  # 4
+            [6, 96, 3, 1],  # 5
+            [6, 160, 3, 2],  # 6
+            [6, 320, 1, 1],  # 7
         ]
-        
+
         # only check the first element, assuming user knows t,c,n,s are required
         if len(inverted_residual_setting) == 0 or len(inverted_residual_setting[0]) != 4:
             raise ValueError("inverted_residual_setting should be non-empty "
@@ -120,13 +121,13 @@ class MobileNetV2(nn.Module):
         if opt.pre_img:
             print('adding pre_img layer...')
             self.pre_img_layer = nn.Sequential(
-            nn.Conv2d(3, input_channel, kernel_size=3, padding=1, stride=2, bias=False),
-            nn.BatchNorm2d(input_channel))
+                nn.Conv2d(3, input_channel, kernel_size=3, padding=1, stride=2, bias=False),
+                nn.BatchNorm2d(input_channel))
         if opt.pre_hm:
             print('adding pre_hm layer...')
             self.pre_hm_layer = nn.Sequential(
-            nn.Conv2d(1, input_channel, kernel_size=3, padding=1, stride=2, bias=False),
-            nn.BatchNorm2d(input_channel))
+                nn.Conv2d(1, input_channel, kernel_size=3, padding=1, stride=2, bias=False),
+                nn.BatchNorm2d(input_channel))
         features = [ConvBNReLU(3, input_channel, stride=2)]
         self.key_block = [True]
         all_channels = [input_channel]
@@ -148,10 +149,10 @@ class MobileNetV2(nn.Module):
         # self.key_block.append(False)
         # all_channels.append(self.last_channel)
         for i in range(len(self.key_block) - 1):
-          if self.key_block[i + 1]:
-            self.key_block[i] = True
-            self.key_block[i + 1] = False
-            self.channels.append(all_channels[i])
+            if self.key_block[i + 1]:
+                self.key_block[i] = True
+                self.key_block[i + 1] = False
+                self.channels.append(all_channels[i])
         self.key_block[-1] = True
         self.channels.append(all_channels[-1])
         print('channels', self.channels)
@@ -188,4 +189,3 @@ class MobileNetV2(nn.Module):
             if self.key_block[i]:
                 y.append(x)
         return y
-

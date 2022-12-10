@@ -15,6 +15,7 @@ import numpy as np
 
 BatchNorm = nn.BatchNorm2d
 
+
 def get_model_url(data='imagenet', name='dla34', hash='ba72cf86'):
     return join('http://dl.yf.io/dla/models', data, '{}-{}.pth'.format(name, hash))
 
@@ -246,16 +247,16 @@ class DLA(nn.Module):
                            level_root=True, root_residual=residual_root)
         if opt.pre_img:
             self.pre_img_layer = nn.Sequential(
-            nn.Conv2d(3, channels[0], kernel_size=7, stride=1,
-                      padding=3, bias=False),
-            BatchNorm(channels[0]),
-            nn.ReLU(inplace=True))
+                nn.Conv2d(3, channels[0], kernel_size=7, stride=1,
+                          padding=3, bias=False),
+                BatchNorm(channels[0]),
+                nn.ReLU(inplace=True))
         if opt.pre_hm:
             self.pre_hm_layer = nn.Sequential(
-            nn.Conv2d(1, channels[0], kernel_size=7, stride=1,
-                    padding=3, bias=False),
-            BatchNorm(channels[0]),
-            nn.ReLU(inplace=True))
+                nn.Conv2d(1, channels[0], kernel_size=7, stride=1,
+                          padding=3, bias=False),
+                BatchNorm(channels[0]),
+                nn.ReLU(inplace=True))
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
@@ -304,11 +305,10 @@ class DLA(nn.Module):
         for i in range(6):
             x = getattr(self, 'level{}'.format(i))(x)
             y.append(x)
-        
+
         return y
 
-
-    def load_pretrained_model(self,  data='imagenet', name='dla34', hash='ba72cf86'):
+    def load_pretrained_model(self, data='imagenet', name='dla34', hash='ba72cf86'):
         if name.endswith('.pth'):
             model_weights = torch.load(data + name)
         else:
@@ -521,6 +521,7 @@ class DLAUp(nn.Module):
             layers[-i - 1:] = y
         return x
 
+
 def fill_fc_weights(layers):
     for m in layers.modules():
         if isinstance(m, nn.Conv2d):
@@ -528,15 +529,16 @@ def fill_fc_weights(layers):
             if m.bias is not None:
                 nn.init.constant_(m.bias, 0)
 
+
 class DLASegv0(BaseModel):
     def __init__(self, num_layers, heads, head_convs, opt):
         super(DLASegv0, self).__init__(heads, head_convs, 1, 64, opt=opt)
-        down_ratio=4
+        down_ratio = 4
         self.opt = opt
         self.heads = heads
         self.first_level = int(np.log2(down_ratio))
         self.base = globals()['dla{}'.format(num_layers)](
-          pretrained=True, opt=opt)
+            pretrained=True, opt=opt)
 
         channels = self.base.channels
         scales = [2 ** i for i in range(len(channels[self.first_level:]))]

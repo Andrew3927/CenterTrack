@@ -191,7 +191,7 @@ class KittiDB:
         return bbox_crop
 
     @staticmethod
-    def get_filepath(token: str, table: str, root: str='/data/sets/kitti') -> str:
+    def get_filepath(token: str, table: str, root: str = '/data/sets/kitti') -> str:
         """
         For a token and table, get the filepath to the associated data.
         :param token: KittiDB unique id.
@@ -213,7 +213,7 @@ class KittiDB:
         return filepath
 
     @staticmethod
-    def get_transforms(token: str, root: str='/data/sets/kitti') -> dict:
+    def get_transforms(token: str, root: str = '/data/sets/kitti') -> dict:
         """
         Returns transforms for the input token.
         :param token: KittiDB unique id.
@@ -310,7 +310,7 @@ class KittiDB:
                 # The second quaternion in yaw_box transforms the coordinate frame from the object frame
                 # to KITTI camera frame. The equivalent cannot be naively done afterwards, as it's a rotation
                 # around the local object coordinate frame, rather than the camera frame.
-                quat_box = Quaternion(axis=(0, 1, 0), angle=yaw_camera) * Quaternion(axis=(1, 0, 0), angle=np.pi/2)
+                quat_box = Quaternion(axis=(0, 1, 0), angle=yaw_camera) * Quaternion(axis=(1, 0, 0), angle=np.pi / 2)
                 box = Box([0.0, 0.0, 0.0], wlh, quat_box, name=name)
 
                 # 2: Translate: KITTI defines the box center as the bottom center of the vehicle. We use true center,
@@ -346,9 +346,9 @@ class KittiDB:
     def get_boxes_2d(self,
                      token: str,
                      filter_classes: List[str] = None) -> Tuple[
-            List[Tuple[float, float, float, float]],
-            List[str]
-        ]:
+        List[Tuple[float, float, float, float]],
+        List[str]
+    ]:
         """
         Get the 2d boxes associated with a sample.
         :return: A list of boxes in KITTI format (xmin, ymin, xmax, ymax) and a list of the class names.
@@ -373,7 +373,6 @@ class KittiDB:
                 boxes.append(bbox_2d)
                 names.append(name)
         return boxes, names
-
 
     @staticmethod
     def box_to_string(name: str,
